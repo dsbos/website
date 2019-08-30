@@ -31,7 +31,7 @@ They are born and when they die, they are not resurrected.
 If you use a {{< glossary_tooltip term_id="deployment" >}} to run your app,
 it can create and destroy Pods dynamically.
 
-Each Pod gets its own IP address, however in a Deployment, the set of Pods
+Each Pod gets its own IP address; however, in a Deployment, the set of Pods
 running in one moment in time could be different from
 the set of Pods running that application a moment later.
 
@@ -47,9 +47,9 @@ Enter _Services_.
 In Kubernetes, a Service is an abstraction which defines a logical set of Pods
 and a policy by which to access them (sometimes this pattern is called
 a micro-service). The set of Pods targeted by a Service is usually determined
-by a {{< glossary_tooltip text="selector" term_id="selector" >}}
-(see [below](#services-without-selectors) for why you might want a Service
-_without_ a selector).
+by a {{< glossary_tooltip text="selector" term_id="selector" >}}.
+(See [below](#services-without-selectors) for why you might want a Service
+_without_ a selector.)
 
 For example, consider a stateless image-processing backend which is running with
 3 replicas.  Those replicas are fungible&mdash;frontends do not care which backend
@@ -70,7 +70,7 @@ balancer in between your application and the backend Pods.
 
 ## Defining a Service
 
-A Service in Kubernetes is a REST object, similar to a Pod.  Like all of the
+A Service in Kubernetes is a REST object, similar to a Pod.  As with all of the
 REST objects, you can `POST` a Service definition to the API server to create
 a new instance.
 
@@ -95,8 +95,8 @@ This specification creates a new Service object named “my-service”, which
 targets TCP port 9376 on any Pod with the `app=MyApp` label.
 
 Kubernetes assigns this Service an IP address (sometimes called the "cluster IP"),
-which is used by the Service proxies
-(see [Virtual IPs and service proxies](#virtual-ips-and-service-proxies) below).
+which is used by the Service proxies.
+(See [Virtual IPs and service proxies](#virtual-ips-and-service-proxies) below.)
 
 The controller for the Service selector continuously scans for Pods that
 match its selector, and then POSTs any updates to an Endpoint object
@@ -215,11 +215,11 @@ Kubernetes v1.1 added iptables mode proxying, and in Kubernetes v1.2 the
 iptables mode for kube-proxy became the default.
 Kubernetes v1.8 added ipvs proxy mode.
 
-### User space proxy mode {#proxy-mode-userspace}
+### User-space proxy mode {#proxy-mode-userspace}
 
-In this mode, kube-proxy watches the Kubernetes master for the addition and
+In user-space proxy mode mode, kube-proxy watches the Kubernetes master for the addition and
 removal of Service and Endpoint objects. For each Service it opens a
-port (randomly chosen) on the local node.  Any connections to this "proxy port"
+port (randomly chosen) on the local node.  Any connection to this "proxy port"
 is proxied to one of the Service's backend Pods (as reported via
 Endpoints). kube-proxy takes the `SessionAffinity` setting of the Service into
 account when deciding which backend Pod to use.
@@ -372,8 +372,8 @@ compatible](https://docs.docker.com/userguide/dockerlinks/) variables (see
 and simpler `{SVCNAME}_SERVICE_HOST` and `{SVCNAME}_SERVICE_PORT` variables,
 where the Service name is upper-cased and dashes are converted to underscores.
 
-For example, the Service `"redis-master"` which exposes TCP port 6379 and has been
-allocated cluster IP address 10.0.0.11, produces the following environment
+For example, a Service `"redis-master"` that exposes TCP port 6379 and has been
+allocated cluster IP address 10.0.0.11 produces the following environment
 variables:
 
 ```shell
@@ -465,7 +465,7 @@ The default is `ClusterIP`.
 `Type` values and their behaviors are:
 
    * `ClusterIP`: Exposes the Service on a cluster-internal IP. Choosing this value
-     makes the Service only reachable from within the cluster. This is the
+     makes the Service reachable only from within the cluster. This is the
      default `ServiceType`.
    * [`NodePort`](#nodeport): Exposes the Service on each Node's IP at a static port
      (the `NodePort`). A `ClusterIP` Service, to which the `NodePort` Service
@@ -891,7 +891,7 @@ spec:
   externalName: my.database.example.com
 ```
 {{< note >}}
-ExternalName accepts an IPv4 address string, but as a DNS names comprised of digits, not as an IP address. ExternalNames that resemble IPv4 addresses are not resolved by CoreDNS or ingress-nginx because ExternalName
+ExternalName accepts an IPv4 address string, but as a DNS name composed of digits, not as an IP address. ExternalNames that resemble IPv4 addresses are not resolved by CoreDNS or ingress-nginx because ExternalName
 is intended to specify a canonical DNS name. To hardcode an IP address, consider using
 [headless Services](#headless-services).
 {{< /note >}}
@@ -912,7 +912,7 @@ This section is indebted to the [Kubernetes Tips - Part
 
 ### External IPs
 
-If there are external IPs that route to one or more cluster nodes, Kubernetes Services can be exposed on those
+If there are external IP addresses that route to one or more cluster nodes, Kubernetes Services can be exposed on those
 `externalIPs`. Traffic that ingresses into the cluster with the external IP (as destination IP), on the Service port,
 will be routed to one of the Service endpoints. `externalIPs` are not managed by Kubernetes and are the responsibility
 of the cluster administrator.
@@ -939,7 +939,7 @@ spec:
 
 ## Shortcomings
 
-Using the userspace proxy for VIPs, work at small to medium scale, but will
+Using the userspace proxy for VIPs works at small to medium scale, but will
 not scale to very large clusters with thousands of Services.  The [original
 design proposal for portals](http://issue.k8s.io/1107) has more details on
 this.
@@ -951,7 +951,7 @@ proxy mode does not
 obscure in-cluster source IPs, but it does still impact clients coming through
 a load balancer or node-port.
 
-The `Type` field is designed as nested functionality - each level adds to the
+The `Type` field is designed as nested functionality–each level adds to the
 previous.  This is not strictly required on all cloud providers (e.g. Google Compute Engine does
 not need to allocate a `NodePort` to make `LoadBalancer` work, but AWS does)
 but the current API requires it.
@@ -967,7 +967,7 @@ worth understanding.
 One of the primary philosophies of Kubernetes is that you should not be
 exposed to situations that could cause your actions to fail through no fault
 of your own. For the design of the Service resource, this means not making
-you choose your own port number for a if that choice might collide with
+you choose your own port number for a Service if that choice might collide with
 someone else's choice.  That is an isolation failure.
 
 In order to allow you to choose a port number for your Services, we must
@@ -982,8 +982,8 @@ fail with a message indicating an IP address could not be allocated.
 
 In the control plane, a background controller is responsible for creating that
 map (needed to support migrating from older versions of Kubernetes that used
-in-memory locking). Kubernetes also uses controllers to checking for invalid
-assignments (eg due to administrator intervention) and for cleaning up allocated
+in-memory locking). Kubernetes also uses controllers to check for invalid
+assignments (e.g., due to administrator intervention) and for cleaning up allocated
 IP addresses that are no longer used by any Services.
 
 ### Service IP addresses {#ips-and-vips}
